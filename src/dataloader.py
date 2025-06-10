@@ -473,7 +473,7 @@ class SubGroupLoader(Dataset):
     def __getitem__(self, idx):
         images = self.data[idx]
         segmentations = self.segmentations[idx]
-        labels = None if self.labels is None else self.labels[idx]
+        labels = [] if self.labels is None else self.labels[idx]
         
         file_names = self.file_names[idx] if self.file_names is not None else []
         
