@@ -1,0 +1,5 @@
+img_path,segmentation_path
+data/oasis_3d_data/OASIS_OAS1_0001_MR1/aligned_t1w.nii.gz,data/oasis_3d_data/OASIS_OAS1_0001_MR1/aligned_t1w_seg_seg35.nii.gz
+data/oasis_3d_data/OASIS_OAS1_0002_MR1/aligned_t1w.nii.gz,data/oasis_3d_data/OASIS_OAS1_0002_MR1/aligned_t1w_seg_seg35.nii.gz
+data/oasis_3d_data/OASIS_OAS1_0003_MR1/aligned_t1w.nii.gz,data/oasis_3d_data/OASIS_OAS1_0003_MR1/aligned_t1w_seg_seg35.nii.gz
+data/oasis_3d_data/OASIS_OAS1_0004_MR1/aligned_t1w.nii.gz,data/oasis_3d_data/OASIS_OAS1_0004_MR1/aligned_t1w_seg_seg35.nii.gz
