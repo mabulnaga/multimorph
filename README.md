@@ -12,6 +12,16 @@ This repository contains:
 - pre-trained model weights in `./models/`
 - data in (`./data/`). This folder contains 2D slices from OASIS-1 (`./data/oasisdata/`) used in the tutorial. The folder also contains a few 3D volumes from OASIS-1 in `./data/oasis_3d_data/` to be used to test 3D atlas construction.
 
+
+## Construct your Own Atlas Using Our Pre-trained Model 
+
+## Demo Tutorials
+We include two tutorial notebooks for training your own MultiMorph model on 2D data.
+- OASIS-1 demo: [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/mabulnaga/multimorph/blob/main/src/demo_oasis1.ipynb)
+
+
+## Training (Coming soon)
+
 ## Citation
 
 If you find the paper or repository useful, please consider citing:
@@ -25,12 +35,3 @@ If you find the paper or repository useful, please consider citing:
               year={2025}
               }
 ```
-
-## Construct your Own Atlas Using Our Pre-trained Model 
-
-## Demo Tutorials
-We include two tutorial notebooks for training your own MultiMorph model on 2D data.
-- OASIS-1 demo: [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/mabulnaga/multimorph/blob/main/src/demo_oasis1.ipynb)
-
-
-## Training (Coming soon)
