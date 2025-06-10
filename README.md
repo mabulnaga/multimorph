@@ -1,4 +1,4 @@
-# MultiMorph: On-demand Atlas Construction
+# MultiMorph: On-demand Atlas Construction (CVPR 2025)
 ### [Project page](https://people.csail.mit.edu/abulnaga/multimorph/index.html) | [Paper](https://arxiv.org/abs/2504.00247) | [Colab notebook](https://github.com/mabulnaga/multimorph/)
 
 ![Sample atlases constructed](https://people.csail.mit.edu/abulnaga/multimorph/teaser.png)
