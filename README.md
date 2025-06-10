@@ -5,7 +5,7 @@
 
 MultiMorph is an on-demand atlas construction neural network for 3D brain MRI. MultiMorph constructs atlases for a dataset in a single forward pass of the network, on the CPU, without requiring any re-training or fine tuning. MultiMorph is generally invariant to the modality as it was trained on T1w, T2w, and synthetic data covering a broad range of imaging contrasts.
 
-This repository contains code to run MultiMorph on your data and construct an atlas in seconds to minutes. We also include demo CoLab networks showing how to train on 2D images from OASIS-1 and MNIST.
+This repository contains code to run MultiMorph on your data and construct an atlas in seconds to minutes. We also include demo CoLab notebookes showing how to train on 2D images from OASIS-1 and MNIST.
 
 This repository contains:
 - source code (in `./src/`) to train a MultiMorph model and code to construct an atlas (inference) using our pre-trained model.
