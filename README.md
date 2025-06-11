@@ -14,6 +14,18 @@ This repository contains:
 
 
 ## Construct your Own Atlas Using Our Pre-trained Model 
+We include a script to load our pre-trained model and run inference on your data. All you need is a CSV file with each row pointing to the image and (optionally) segmentation in your dataset.
+To run,
+```
+python src/build_atlas_inference.py --model_path models/model_cvpr.pth --atlas_save_path path_to_save_atlas_files --csv_path path_to_csv_file --img_header_name header_name_img --segmentation_header_name -seg_header_name
+```
+The input arguments are:
+- `model_path`: full file path to the model weights. The CVPR model is included in this repo under `models/model_cvpr.pth`
+- `atlas_save_path`: full path to a folder on your system to save the output atlas and atlas segmentation files. By default, the code will save the outputs as `atlas_save_path/atlas.nii.gz` and `atlas_save_path/atlas_segmentation.nii.gz`
+- `csv_path`: full file path to the CSV with your dataset information. The CSV file should have one or two columns. The first column will include full paths to each image file. The second (optional) column points to the corresponding segmentation files.
+- `img_header_name`: name of the header in the CSV for the image files. By default, uses `img_path`
+- `segmentation_header_name`: name of the header in the CSV for the segmentation files. If you do not have segmentations, pass in `None`, or don't include this argument. By default, it is set to `None`
+
 
 ## Demo Tutorials
 We include two tutorial notebooks for training your own MultiMorph model on 2D data.
