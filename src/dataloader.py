@@ -8,11 +8,13 @@ from torchvision import transforms
 from torch.utils.data import Dataset, DataLoader
 from typing import Tuple
 import nibabel as nib
+from nibabel.orientations import io_orientation, axcodes2ornt, ornt_transform, apply_orientation
+
 import os
 
 import torch
 import torch.nn.functional as F
-import voxel as vx
+#import voxel as vx
 
 class PadtoDivisible:
     def __init__(self, divisor=16, mode='constant', value=0):
@@ -51,6 +53,21 @@ class PadtoDivisible:
         
         return img_padded
 
+
+def load_reoriented_RAS(filename):
+    # Load image
+    img = nib.load(filename)
+    data = img.get_fdata()
+
+    # Compute orientation transform
+    orig_ornt = io_orientation(img.affine)
+    target_ornt = axcodes2ornt(('R', 'A', 'S'))
+    transform_ornt = ornt_transform(orig_ornt, target_ornt)
+
+    # Apply orientation
+    data_ras = apply_orientation(data, transform_ornt).copy()
+
+    return data_ras  # numpy array, RAS orientation
 
 class GroupDataLoader(Dataset):
     '''
@@ -308,9 +325,12 @@ class GroupDataLoader3D(GroupDataLoader):
         img_name = img_list[idx]
         file_type = os.path.splitext(img_name)[1]
         
-        img = vx.load_volume(img_name)
-        img = img.reorient('RAS')
-        img = self.clip_image(img._tensor).squeeze()
+        # img = vx.load_volume(img_name)
+        # img = img.reorient('RAS')
+        #img = self.clip_image(img._tensor).squeeze()
+        
+        img = torch.from_numpy(load_reoriented_RAS(img_name)).float()
+        img = self.clip_image(img)
         
         #     #img = torch.from_numpy(nib.load(img_name).get_fdata()).float()
         #     #img = self.clip_image(img)
@@ -324,8 +344,10 @@ class GroupDataLoader3D(GroupDataLoader):
         img_name = img_list[idx]
         file_type = os.path.splitext(img_name)[1]
         
-        img = vx.load_volume(img_name)
-        img = img.reorient('RAS')._tensor.squeeze().float()
+        # img = vx.load_volume(img_name)
+        # img = img.reorient('RAS')._tensor.squeeze().float()
+        img = torch.from_numpy(load_reoriented_RAS(img_name)).float()
+
         
         #     #img = torch.from_numpy(nib.load(img_name).get_fdata()).float()
         return img
@@ -595,7 +617,7 @@ class SubGroupLoader3D(GroupDataLoader3D):
     
     def __getitem__(self, idx):
         images = self.data[idx]
-        segmentations = self.segmentations[idx]
+        segmentations = self.segmentations[idx] if self.segmentations is not None else []
         file_names = self.file_names[idx] if self.file_names is not None else []
         
         n_images = len(images) if not self.load_batch else 1
