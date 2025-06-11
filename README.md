@@ -1,5 +1,5 @@
 # MultiMorph: On-demand Atlas Construction (CVPR 2025)
-### [Project page](https://people.csail.mit.edu/abulnaga/multimorph/index.html) | [Paper](https://arxiv.org/abs/2504.00247) | [Colab notebook](https://github.com/mabulnaga/multimorph/)
+### [Project page](https://people.csail.mit.edu/abulnaga/multimorph/index.html) | [Paper](https://arxiv.org/abs/2504.00247) | [Colab notebook](https://colab.research.google.com/github/mabulnaga/multimorph/blob/main/src/build_3d_atlas.ipynb)
 
 ![Sample atlases constructed](https://people.csail.mit.edu/abulnaga/multimorph/teaser.png)
 
@@ -26,11 +26,13 @@ The input arguments are:
 - `img_header_name`: name of the header in the CSV for the image files. By default, uses `img_path`
 - `segmentation_header_name`: name of the header in the CSV for the segmentation files. If you do not have segmentations, pass in `None`, or don't include this argument. By default, it is set to `None`
 
+We also include a tutorial CoLab notebook showing how to construct an atlas on 4 3D images from OASIS-1. However, we recommend running the code locally as the CoLab compute power is limited.
 
 ## Demo Tutorials
-We include two tutorial notebooks for training your own MultiMorph model on 2D data.
-- OASIS-1 demo: [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/mabulnaga/multimorph/blob/main/src/demo_oasis1.ipynb)
-
+We include a tutorial notebooks for training your own MultiMorph model on 2D data.
+- OASIS-1 2D training demo: [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/mabulnaga/multimorph/blob/main/src/demo_oasis1.ipynb)
+We also include a tutorial notebook for running on inference on a pre-trained model to create a 3D atlas.
+- OASIS-1 3D atlas construction (inference) demo: [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/mabulnaga/multimorph/blob/main/src/build_3d_atlas.ipynb)
 
 ## Training (Coming soon)
 
