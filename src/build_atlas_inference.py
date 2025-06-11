@@ -197,10 +197,10 @@ if __name__=='__main__':
                             Use None if no segmentations are provided.')
     args = parser.parse_args()
     
-    csv_path = '/autofs/space/saffron_001/users/abulnaga/projects/multimorph/multimorph-git/multimorph/data/oasis_3d_data/metadata_local.csv'
-    atlas_save_path = '/autofs/space/saffron_001/users/abulnaga/projects/multimorph/multimorph-git/results'
-    img_header_name = 'img_path'
-    segmentation_header_name = 'segmentation_path'
-    model_path = '/autofs/space/saffron_001/users/abulnaga/projects/multimorph/multimorph-git/multimorph/models/model_cvpr.pt'
+    model_path = args.model_path
+    atlas_save_path = args.atlas_save_path
+    csv_path = args.csv_path
+    img_header_name = args.img_header_name
+    segmentation_header_name = args.segmentation_header_name
     
     wrapper_build_atlas(model_path, atlas_save_path, csv_path, img_header_name, segmentation_header_name)
