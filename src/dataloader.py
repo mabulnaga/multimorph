@@ -10,6 +10,47 @@ from typing import Tuple
 import nibabel as nib
 import os
 
+import torch
+import torch.nn.functional as F
+import voxel as vx
+
+class PadtoDivisible:
+    def __init__(self, divisor=16, mode='constant', value=0):
+        self.divisor = divisor
+        self.mode = mode
+        self.value = value
+
+    def __call__(self, img):
+        """
+        Pads a 4D image (G, C, H, W, D) so that H, W, D are divisible by 'divisor'.
+        Args:
+            img: Input tensor (G, C, H, W, D).
+        Returns:
+            Padded tensor (G, C, H', W', D') where each spatial dim is divisible by 'divisor'.
+        """
+        
+        if img.ndim != 5:
+            raise ValueError(f"Expected (G, C, H, W, D), got shape {img.shape}")
+        
+        G, C, H, W, D = img.shape
+        
+        pad_h = (self.divisor - H % self.divisor) % self.divisor
+        pad_w = (self.divisor - W % self.divisor) % self.divisor
+        pad_d = (self.divisor - D % self.divisor) % self.divisor
+        
+        pad_top = pad_h // 2
+        pad_bottom = pad_h - pad_top
+        pad_left = pad_w // 2
+        pad_right = pad_w - pad_left
+        pad_front = pad_d // 2
+        pad_back = pad_d - pad_front
+        
+        padding = [pad_front, pad_back, pad_left, pad_right, pad_top, pad_bottom]
+        
+        img_padded = F.pad(img, padding, mode=self.mode, value=self.value)
+        
+        return img_padded
+
 
 class GroupDataLoader(Dataset):
     '''
@@ -267,11 +308,12 @@ class GroupDataLoader3D(GroupDataLoader):
         img_name = img_list[idx]
         file_type = os.path.splitext(img_name)[1]
         
-        if 'nii' in file_type or 'gz' in file_type:
-            img = torch.from_numpy(nib.load(img_name).get_fdata()).float()
-            img = self.clip_image(img)
-        else:
-            img = torch.load(img_name)['v'].squeeze()
+        img = vx.load_volume(img_name)
+        img = img.reorient('RAS')
+        img = self.clip_image(img._tensor).squeeze()
+        
+        #     #img = torch.from_numpy(nib.load(img_name).get_fdata()).float()
+        #     #img = self.clip_image(img)
         
         return img
 
@@ -282,14 +324,13 @@ class GroupDataLoader3D(GroupDataLoader):
         img_name = img_list[idx]
         file_type = os.path.splitext(img_name)[1]
         
-        if 'nii' in file_type or 'gz' in file_type:
-            img = torch.from_numpy(nib.load(img_name).get_fdata()).float()
-        else:
-            img = torch.load(img_name)['v'].squeeze()
-            
+        img = vx.load_volume(img_name)
+        img = img.reorient('RAS')._tensor.squeeze().float()
+        
+        #     #img = torch.from_numpy(nib.load(img_name).get_fdata()).float()
         return img
 
-    def clip_image(self, image: torch.Tensor, pct: float = 0.9999) -> torch.Tensor:
+    def clip_image(self, image: torch.Tensor, pct: float = 0.998) -> torch.Tensor:
         '''
         Clips image based on a percentage quantile.[0,1] normalization
         Args:
@@ -438,8 +479,9 @@ class SubGroupLoader(Dataset):
         if not isinstance(self.data, list):
             self.data = [self.data]
         
-        if not isinstance(self.segmentations, list):
-            self.segmentations = [self.segmentations]
+        if self.segmentations is not None:
+            if not isinstance(self.segmentations, list):
+                self.segmentations = [self.segmentations]
         
         if self.labels is not None:
             if not isinstance(self.labels, list):
@@ -496,8 +538,9 @@ class SubGroupLoader(Dataset):
         return sample
       
 class SubGroupLoader3D(GroupDataLoader3D):
-    def __init__(self, data: List[str], labels: List[str],
-                 segmentations: List[str], file_names: Optional[List[str]] = None,
+    def __init__(self, data: list[list[str]], segmentations: list[list[str]]=None, 
+                 labels: Optional[list[int]]=None,
+                 file_names: Optional[list[str]] = None,
                  dataset_name : str = 'oasis',
                  load_batch: bool = False,
                  segmentation_to_one_hot : bool = True,
@@ -505,9 +548,9 @@ class SubGroupLoader3D(GroupDataLoader3D):
         '''
         Initializes the instance of the SubGroupLoader3D class
         Args:
-            data: a list of strings pointing to images to load
+            data: a list of a list of strings pointing to images to load
             labels: a list of tensors of shape (n) where n is the dataset size.
-            segmentations: a list of strings pointing to images to load
+            segmentations: a list of a list of strings pointing to images to load
             load_batch: wheter to load the data in batch mode or not.,
             file_names: a list of file names for each image.
             transform: a torchvision.transforms.Compose object that contains the transforms to be applied.
@@ -520,6 +563,19 @@ class SubGroupLoader3D(GroupDataLoader3D):
         self.dataset_name = dataset_name
         self.load_batch = load_batch
         self.to_one_hot = segmentation_to_one_hot
+        
+        # make sure the data are as lists of lists.
+        if not isinstance(self.data, list):
+            raise ValueError("Data should be a list of lists of strings pointing to images.")
+        if isinstance(self.data, list) and len(self.data) > 1:
+            self.data = [self.data]
+        # repeat for segmentations
+        if self.segmentations is not None:
+            if not isinstance(self.segmentations, list):
+                raise ValueError("Segmentations should be a list of lists of strings pointing to segmentations.")
+            if isinstance(self.segmentations, list) and len(self.segmentations) > 1:
+                self.segmentations = [self.segmentations]    
+        
         self.img_size = self._get_img_size()
 
     def _get_img_size(self) -> List[int]:
@@ -553,7 +609,7 @@ class SubGroupLoader3D(GroupDataLoader3D):
         if images.dtype == torch.uint8:
             images = images.float() / 255.0
         
-        labels = self.labels[idx]
+        labels = self.labels[idx] if self.labels is not None else []
         
         if self.segmentations is not None:
             segmentations = self.load_multiple_segmentations(segmentations, range(0,n_images))
@@ -576,7 +632,7 @@ class SubGroupLoader3D(GroupDataLoader3D):
         #TODO: Add transforms to the labels too.
         if self.transform:
             images = self.transform(images)
-            segmentations = self.transform(segmentations)
+            segmentations = self.transform(segmentations) if segmentations is not None else None
             
         sample = {'image':images, 'label': labels, 'segmentation': segmentations, 'file_name': file_names}
         
