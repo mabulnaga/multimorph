@@ -1,6 +1,6 @@
 import torch
 import torch.nn as nn
-from . import layers
+import layers
 from typing import List
 import einops
 import torch.utils.checkpoint as checkpoint
