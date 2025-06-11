@@ -3,9 +3,9 @@ Group layers
 Maz Abulnaga
 """
 import os
-os.environ['VXM_BACKEND'] = 'pytorch'
+#os.environ['VXM_BACKEND'] = 'pytorch'
 os.environ['NEURITE_BACKEND'] = 'pytorch'
-import voxelmorph as vxm
+#import voxelmorph as vxm
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
